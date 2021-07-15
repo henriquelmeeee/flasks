@@ -13,7 +13,7 @@ if sq.connect('banco.db'):
     print('* Cliente de dados conectado com sucesso!')
 else:
     print('Um erro ocorreu ao tentar-se conectar em "banco.db"!')
-
+    
 cursor.execute("CREATE TABLE IF NOT EXISTS usuarios (user text, password text, id text, time text)")
 cursor.execute("CREATE TABLE IF NOT EXISTS posts (conteudo text, id text, autor text, likes integer)")
 
@@ -44,7 +44,9 @@ def homepage_cadastro():
     cursor.execute("INSERT INTO usuarios VALUES ('" + str(name) + "', '" + str(
         senha) + "', '" + str(id) + "', '" + str(x) + "')")
     banco.commit()
-    return render_template('homepage.html')
+    cursor.execute("")
+    posts = cursor.fetchall()
+    return render_template('homepage.html', posts=posts)
 
 @app.route('/homepage_login', methods=['POST'])
 def homepage_login():
@@ -55,7 +57,9 @@ def homepage_login():
     if mesg == '[]':
         return render_template('index_senha_incorreta.html')
     else:
-        return render_template('homepage.html')
+        cursor.execute("SELECT conteudo FROM posts")
+        posts = cursor.fetchall()
+        return render_template('homepage.html', posts=posts)
 
 @app.route('/homepage_cadastro_post', methods=['POST'])
 def homepage_cadastro_post():
@@ -64,8 +68,11 @@ def homepage_cadastro_post():
     id = random.randint(10000000000000, 1000000000000000)
     cursor.execute("INSERT INTO posts VALUES ('"+str(post)+"', '"+str(id)+"', '"+str(usuario)+"' , 0)")
     banco.commit()
-    return render_template('homepage.html')
+    cursor.execute("SELECT conteudo FROM posts")
+    posts = cursor.fetchall()
+    return render_template('homepage.html', posts=posts)
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
     
